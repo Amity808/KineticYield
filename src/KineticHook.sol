@@ -203,14 +203,12 @@ contract KineticHook is BaseHook {
     ///
     /// @param key              The PoolKey describing the pool to rebalance.
     /// @param liquidityAmount  How much liquidity (in v4 LP units) the vault should remove.
-    /// @param tickLower        Lower tick of the target LP position.
-    /// @param tickUpper        Upper tick of the target LP position.
     /// @param bridgeData       ABI-encoded payload for the bridge provider.
     function handleReactiveRebalance(
         PoolKey calldata key,
         uint128 liquidityAmount,
-        int24 tickLower,
-        int24 tickUpper,
+        int24 /* tickLower */,
+        int24 /* tickUpper */,
         bytes calldata bridgeData
     ) external onlyReactive {
         PoolId id = key.toId();
