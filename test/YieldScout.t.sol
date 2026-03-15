@@ -4,19 +4,17 @@ pragma solidity ^0.8.26;
 import {Test, console2} from "forge-std/Test.sol";
 import {Vm} from "forge-std/Vm.sol";
 import {YieldScout} from "../src/YieldScout.sol";
-import {IReactive} from "../src/interfaces/IReactive.sol";
+import {IReactive} from "@reactive-lib/interfaces/IReactive.sol";
 
 /// @title YieldScoutTest
 /// @notice Comprehensive Foundry test for the YieldScout Reactive Contract.
 ///
 /// ── Test Architecture Note ────────────────────────────────────────────────────
-/// YieldScout is a Reactive Network contract. Its `react()` function requires
-/// `vmMode == true` (i.e., running inside the ReactVM). In a normal Foundry test,
-/// the system contract at 0xfffFfF is NOT deployed, so `_detectVm()` sets vmMode=true.
-/// This means `react()` is directly callable in tests — which is exactly what we want.
-///
-/// However, `subscribe()` calls in the constructor are gated by `!vmMode`, so they
-/// are skipped when vmMode=true — avoiding any call to the undeployed system contract.
+/// YieldScout extends AbstractReactive. Its `react()` is gated by `vmOnly`,
+/// which requires `vm == true`. In a Foundry test the system contract at
+/// 0xfffFfF has no code, so `detectVm()` sets `vm = true`. This means
+/// `react()` is callable in tests, while subscriptions in the constructor are
+/// skipped (gated by `!vm`) — avoiding calls to the undeployed system contract.
 /// ─────────────────────────────────────────────────────────────────────────────
 ///
 /// Test Cases:
@@ -46,8 +44,8 @@ contract YieldScoutTest is Test {
     address constant LOCAL_POOL  = address(0x1000000000000000000000000000000000000001);
     // Arbitrum pool serves as the HIGH-YIELD REMOTE source
     address constant REMOTE_POOL = address(0x2000000000000000000000000000000000000002);
-    // Simulated KineticHook address on Unichain
-    address constant KINETIC_HOOK = address(0x3000000000000000000000000000000000000003);
+    // Simulated KineticCallback address on Unichain
+    address constant KINETIC_CALLBACK = address(0x3000000000000000000000000000000000000003);
 
     address constant OWNER        = address(0x4000000000000000000000000000000000000004);
     address constant RANDOM_ADDR  = address(0x5000000000000000000000000000000000000005);
@@ -115,7 +113,7 @@ contract YieldScoutTest is Test {
         // Deploy from OWNER address so owner state is correctly set
         vm.prank(OWNER);
         scout = new YieldScout(
-            KINETIC_HOOK,
+            KINETIC_CALLBACK,
             UNICHAIN_CHAIN_ID,
             YIELD_THRESHOLD,
             50,              // minConfidenceScore
@@ -130,7 +128,7 @@ contract YieldScoutTest is Test {
 
     function testConstructorState() public view {
         assertEq(scout.owner(), OWNER, "Owner should be set");
-        assertEq(scout.kineticHook(), KINETIC_HOOK, "KineticHook should be set");
+        assertEq(scout.kineticCallback(), KINETIC_CALLBACK, "KineticCallback should be set");
         assertEq(scout.destinationChainId(), UNICHAIN_CHAIN_ID, "Destination chain should be Unichain");
         assertEq(scout.yieldThreshold(), YIELD_THRESHOLD, "Yield threshold should match");
         assertEq(scout.minConfidenceScore(), 50, "Confidence score should be 50");
@@ -280,7 +278,7 @@ contract YieldScoutTest is Test {
                 uint256 targetChain = uint256(logs[i].topics[1]);
                 address targetContract = address(uint160(uint256(logs[i].topics[2])));
                 assertEq(targetChain, UNICHAIN_CHAIN_ID, "Callback must target Unichain");
-                assertEq(targetContract, KINETIC_HOOK, "Callback must target KineticHook");
+                assertEq(targetContract, KINETIC_CALLBACK, "Callback must target KineticCallback");
                 console2.log("Callback emitted to chainId:", targetChain);
                 break;
             }
