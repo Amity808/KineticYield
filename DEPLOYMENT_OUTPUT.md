@@ -1,4 +1,4 @@
-# KineticYield Deployment Output — 2026-03-14
+# KineticYield Deployment Output — 2026-03-18
 
 ## Deployer
 - **Address:** `0x8822F2965090Ddc102F7de354dfd6E642C090269`
@@ -113,3 +113,36 @@ owner:              0x0000000000000000000000008822f2965090ddc102f7de354dfd6e642c
 ```
 
 ✅ **Subscription active** — monitoring Uniswap v4 Swap events on all chains.
+
+---
+
+## Step 5: Deploy KineticHook to Unichain Sepolia
+
+**Command:**
+```
+source .env && forge script script/00_DeployHook.s.sol \
+  --rpc-url $UNICHAIN_RPC \
+  --private-key $PRIVATE_KEY \
+  --broadcast
+```
+
+**Output:**
+```
+No files changed, compilation skipped
+Chain 1301
+
+Estimated gas price: 0.001000001 gwei
+Estimated total gas used for script: 3713661
+Estimated amount required: 0.000003713664713661 ETH
+
+✅  [Success] Hash: 0x3b1771cf823c7c6e0789842e209364591a52d87ac86c585f2ccb829e31abd662
+Block: 47001560
+Paid: 0.000001344314688624 ETH (2688624 gas * 0.000500001 gwei)
+```
+
+✅ **KineticHook deployed** to Unichain Sepolia at `0x8e1dd87d53f35233d2c5bb13335ed05c38e840c0`
+
+- **Chain:** Unichain Sepolia (1301)
+- **Pool Manager:** `0x00b036b58a818b1bc34d502d3fe730db729e62ac`
+- **Reactive Sender (Callback Proxy):** `0x9299472A6399Fd1027ebF067571Eb3e3D7837FC4`
+- **Explorer:** https://sepolia.uniscan.xyz/address/0x8e1dd87d53f35233d2c5bb13335ed05c38e840c0

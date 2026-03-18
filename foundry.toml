@@ -12,3 +12,7 @@ via_ir = false
 [profile.lint]
 exclude_lints = ["screaming-snake-case-immutable", "screaming-snake-case-const"]
 lint_on_build = false
+
+[rpc_endpoints]
+unichain_sepolia = "https://sepolia.unichain.org"
+
